@@ -1,0 +1,52 @@
+version: '2'
+services:
+    app-app:
+        image: app
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_CLOUD_CONSUL_HOST=consul
+            - SPRING_CLOUD_CONSUL_PORT=8500
+            - SPRING_DATASOURCE_URL=jdbc:mariadb://app-mariadb:3306/app
+            - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/token
+            - SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/auth
+            - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
+            - SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/token/introspect
+            - SECURITY_OAUTH2_RESOURCE_JWT_KEY_URI=http://keycloak:9080/auth/realms/jhipster
+            - JHIPSTER_SLEEP=10
+    app-mariadb:
+        image: mariadb:10.1.17
+        environment:
+            - MYSQL_USER=root
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+            - MYSQL_DATABASE=app
+        command: mysqld --lower_case_table_names=1 --skip-ssl
+    
+    gateway-app:
+        image: gateway
+        environment:
+            - SPRING_PROFILES_ACTIVE=prod,swagger
+            - SPRING_CLOUD_CONSUL_HOST=consul
+            - SPRING_CLOUD_CONSUL_PORT=8500
+            - SECURITY_OAUTH2_CLIENT_ACCESS_TOKEN_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/token
+            - SECURITY_OAUTH2_CLIENT_USER_AUTHORIZATION_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/auth
+            - SECURITY_OAUTH2_RESOURCE_USER_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/userinfo
+            - SECURITY_OAUTH2_RESOURCE_TOKEN_INFO_URI=http://keycloak:9080/auth/realms/jhipster/protocol/openid-connect/token/introspect
+            - SECURITY_OAUTH2_RESOURCE_JWT_KEY_URI=http://keycloak:9080/auth/realms/jhipster
+            - JHIPSTER_SLEEP=10
+    
+    consul:
+        extends:
+            file: consul.yml
+            service: consul
+    consul-config-loader:
+        extends:
+            file: consul.yml
+            service: consul-config-loader
+    traefik:
+        extends:
+            file: traefik.yml
+            service: traefik
+    keycloak:
+        extends:
+            file: keycloak.yml
+            service: keycloak
